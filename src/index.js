@@ -7,14 +7,14 @@ const config = {
       gravity: { y: 0 },
     },
   },
-
+  parent: "GameCanvas",
   scale: {
     mode: Phaser.Scale.FIT,
     width: 1920,
     height: 1080,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [PlayScene],
+  scene: [MenuScene, PlayScene, EndScene],
 };
 
 const game = new Phaser.Game(config);

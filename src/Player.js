@@ -10,18 +10,18 @@ class Player extends Phaser.GameObjects.Sprite {
     this.scene.physics.world.enableBody(this);
     this.setDepth(100);
 
-    this.life = 5;
+    this.life = PLAYER_LIVES;
 
-    this.play("Character 1 swim");
+    this.play(sprite);
   }
 
-  goUp() {
+  goUp(cb) {
     this.scene.tweens.add({
       targets: this,
       y: 0 - this.height,
       duration: 2500,
       onComplete: () => {
-        console.log("you win");
+        cb();
       },
     });
   }

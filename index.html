@@ -2,15 +2,34 @@
 <html>
   <head>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <style>
+      .jungle {
+        width: 280px;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
+    <script src="./src/Timer.js"></script>
+    <script src="./src/scenes/EndGame.js"></script>
+    <script src="./src/scenes/MenuScene.js"></script>
     <script src="./src/Scenes/PlayScene.js"></script>
+    <script src="./src/config.js"></script>
     <script src="./src/index.js"></script>
     <script src="./src/Rubbish.js"></script>
     <script src="./src/Player.js"></script>
     <script src="./src/ArrowDetector.js"></script>
     <script src="./src/Lifebuoy.js"></script>
-
-
+    <img class="jungle" src="/src/assets/Manual Swamp Logo.png" />
+    <div id="GameCanvas"></div>
+    <p>FIND YOUR WAY OUT...</p>
+    <p>BEFORE IT's TOO LATE!</p>
   </body>
 </html>

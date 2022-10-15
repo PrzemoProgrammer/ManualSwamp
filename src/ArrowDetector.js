@@ -30,7 +30,7 @@ class ArrowDetector {
       angle: 70,
       yoyo: 1,
       repeat: -1,
-      duration: 1000,
+      duration: ARROW_SPEED,
     });
   }
 

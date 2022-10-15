@@ -21,24 +21,20 @@ class Rubbish extends Phaser.GameObjects.Sprite {
   }
 
   setRandomPosition(w, h) {
-    let randomNumber = this.letRandomNumber(0, 1);
+    let randomNumber = Phaser.Math.Between(0, 1);
     let minX = null;
     let maxX = null;
 
     switch (randomNumber) {
       case 0:
-        (minX = 50), (maxX = w / 4);
+        (minX = 50), (maxX = 150);
         break;
       case 1:
-        (minX = w / 2 + w / 3), (maxX = h - 50);
+        (minX = w - 150), (maxX = w - 50);
         break;
     }
-    this.x = this.letRandomNumber(minX, maxX);
-    this.y = this.letRandomNumber(500, 1000);
-  }
-
-  letRandomNumber(minX, maxX) {
-    return Math.floor(Phaser.Math.Between(minX, maxX));
+    this.x = Phaser.Math.Between(minX, maxX);
+    this.y = Phaser.Math.Between(500, 1000);
   }
 
   disappearing(cb) {

@@ -54,6 +54,8 @@ class PlayScene extends Phaser.Scene {
   }
 
   create() {
+    const charID = new URLSearchParams(window.location.search).get("charid");
+    console.log(charID);
     this.gw = this.game.config.width;
     this.gh = this.game.config.height;
 
@@ -63,7 +65,7 @@ class PlayScene extends Phaser.Scene {
         frames.push({ key: `Character ${i}${j}`, frame: null });
       }
 
-      const anim = this.anims.create({
+      this.anims.create({
         key: `Character ${i} swim`,
         frames,
         frameRate: 10,
@@ -85,30 +87,39 @@ class PlayScene extends Phaser.Scene {
       this,
       this.gw / 2,
       this.gh / 2 + 100,
-      "Character 1 swim"
+      `Character ${charID} swim`
     );
     this.addGarbage();
     this.addLadder();
     this.addArrowDetector();
     this.setClickAble();
     this.addLifebuoys();
+    this.timer = new Timer(this, 40, 40);
 
     this.playerLadderDistance = this.getDistance(this.player, this.ladder);
+    this.ladderStepDistance = this.playerLadderDistance / HITS_TO_WIN;
   }
 
   update() {
+    this.timer.updateTimer();
     this.rubbish.forEach((junk) => {
       if (Phaser.Math.Distance.BetweenPoints(junk, this.player) <= 140) {
         if (this.player.life == 0) {
-          // console.log("you lost");
-          this.scene.restart();
+          LOSE_SERVER_REQUEST(this.timer.result);
+          this.scene.start("EndScene");
           return;
         }
+
         if (junk.moveStop) return;
         junk.moveStop = true;
         junk.swimTween.remove();
         junk.disappearing(() => junk.destroy());
+
+        if (this.isWin) return;
+
         this.player.life--;
+        this.ladder.x += this.ladderStepDistance;
+
         // if (junk.moveStop) return;
         // console.log("hit");
         // junk.moveStop = true;
@@ -154,7 +165,7 @@ class PlayScene extends Phaser.Scene {
   }
 
   addGarbage() {
-    for (let i = 0; i <= 5; i++) {
+    for (let i = 0; i < RUBBISH_COUNT; i++) {
       let skin = null;
       switch (i) {
         case 0:
@@ -178,7 +189,7 @@ class PlayScene extends Phaser.Scene {
       }
       this.addRubbish(skin);
     }
-    this.setSpeedRandomRubbish();
+    this.setRandomRubbishToLowestSpeed();
   }
 
   addLadder() {
@@ -189,23 +200,22 @@ class PlayScene extends Phaser.Scene {
     this.arrowDetector = new ArrowDetector(this, this.gw / 2, this.gh - 100);
   }
 
-  setSpeedRandomRubbish() {
+  setRandomRubbishToLowestSpeed() {
     let randomIndex = Phaser.Math.Between(0, this.rubbish.length - 1);
     this.rubbish[randomIndex].swimTween.remove();
-    this.rubbish[randomIndex].speed = 120000;
+    this.rubbish[randomIndex].speed = SLOWEST_RUBBISH_PATH_DURATION;
     this.rubbish[randomIndex].move(this.player);
   }
 
   setClickAble() {
     this.input.on("pointerdown", (pointer) => {
+      if (this.isWin) return;
       if (
         this.arrowDetector.arrow.angle <= 10 &&
         this.arrowDetector.arrow.angle >= -10
       ) {
         this.moveLadder();
-        console.log("perfect");
       } else {
-        console.log("fail");
         this.arrowDetector.arrowTween.restart();
       }
     });
@@ -217,18 +227,21 @@ class PlayScene extends Phaser.Scene {
 
   moveLadder() {
     if (this.ladder.x >= this.player.x + 50) {
-      this.ladderStepDistance = this.playerLadderDistance / 6;
       this.ladder.x -= this.ladderStepDistance;
     } else {
-      this.player.goUp();
-      console.log("go up");
+      this.isWin = true;
+      this.player.goUp(() => {
+        this.scene.start("EndScene");
+      });
+      WIN_SERVER_REQUEST(this.timer.result);
+      // AJAX REQUEST PLAYER WIN
     }
   }
 
   addLifebuoy() {
     const lifebuoy = new Lifebuoy(this, this.gw, this.gh);
     lifebuoy.setRandomPosition(this.gw, this.gh);
-    lifebuoy.timeToDestroy(5000);
+    lifebuoy.timeToDestroy(LIFEBUOY_LIVE_DURATION);
     lifebuoy.onClick(() => {
       lifebuoy.destroy();
       this.arrowDetector.slow();
@@ -238,7 +251,7 @@ class PlayScene extends Phaser.Scene {
 
   addLifebuoys() {
     this.time.addEvent({
-      delay: 10000,
+      delay: LIFEBUOY_SPAWN_RATE,
       callback: () => this.addLifebuoy(),
       loop: true,
     });
@@ -246,7 +259,7 @@ class PlayScene extends Phaser.Scene {
 
   returnArrowSpeed() {
     this.time.addEvent({
-      delay: 3000,
+      delay: LIFEBOUY_EFFECT_DURATION,
       callback: () => this.arrowDetector.returnSpeed(),
       loop: true,
     });
