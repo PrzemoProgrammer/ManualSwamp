@@ -9,6 +9,8 @@ class Rubbish extends Phaser.GameObjects.Sprite {
     this.speed = Math.floor(Phaser.Math.Between(12000, 50000));
     this.scene.add.existing(this);
     this.scene.physics.world.enableBody(this);
+
+    // this.play(this.sprite);
   }
 
   move(player) {

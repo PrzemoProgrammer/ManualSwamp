@@ -73,6 +73,12 @@ class PlayScene extends Phaser.Scene {
 
     this.rubbish = [];
 
+    this.anims.create({
+      key: "crocSprite",
+      frames: "crocSprite",
+      frameRate: 10,
+    });
+
     this.addBackground();
     // this.addWater();
     this.player = new Player(
@@ -88,13 +94,6 @@ class PlayScene extends Phaser.Scene {
     this.addLifebuoys();
 
     this.playerLadderDistance = this.getDistance(this.player, this.ladder);
-
-    this.anims.create({
-      key: "crocSwim",
-      frames: "crocSprite",
-      frameRate: 10,
-      repeat: -1,
-    });
   }
 
   update() {
@@ -133,6 +132,7 @@ class PlayScene extends Phaser.Scene {
   addRubbish(skin) {
     const junk = new Rubbish(this, this.gw, this.gh, skin);
     this.rubbish.push(junk);
+    junk.play(skin);
     junk.setRandomPosition(this.gw, this.gh);
     junk.move(this.player);
 
