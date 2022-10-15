@@ -8,6 +8,9 @@ class Lifebuoy extends Phaser.GameObjects.Sprite {
 
     this.setInteractive();
     this.scene.add.existing(this);
+    this.setScale(0);
+    this.respawnTween();
+    this.setDepth(1000);
   }
 
   setRandomPosition(w, h) {
@@ -24,7 +27,7 @@ class Lifebuoy extends Phaser.GameObjects.Sprite {
         break;
     }
     this.x = this.letRandomNumber(minX, maxX);
-    this.y = this.letRandomNumber(500, 1080);
+    this.y = this.letRandomNumber(500, 1000);
   }
 
   letRandomNumber(minX, maxX) {
@@ -37,7 +40,15 @@ class Lifebuoy extends Phaser.GameObjects.Sprite {
     });
   }
 
-  destroyTimer(time) {
+  timeToDestroy(time) {
     this.scene.time.delayedCall(time, () => this.destroy(), null, this);
+  }
+
+  respawnTween() {
+    this.scene.tweens.add({
+      targets: this,
+      scale: 1,
+      duration: 1000,
+    });
   }
 }

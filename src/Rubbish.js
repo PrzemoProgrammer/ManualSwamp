@@ -6,11 +6,9 @@ class Rubbish extends Phaser.GameObjects.Sprite {
     this.maxY = y;
     this.sprite = sprite;
 
-    this.speed = Math.floor(Phaser.Math.Between(12000, 50000));
+    this.speed = Math.floor(Phaser.Math.Between(90000, 20000));
     this.scene.add.existing(this);
     this.scene.physics.world.enableBody(this);
-
-    // this.play(this.sprite);
   }
 
   move(player) {
@@ -19,7 +17,6 @@ class Rubbish extends Phaser.GameObjects.Sprite {
       y: player.y,
       x: player.x,
       duration: this.speed,
-      onComplete: () => {},
     });
   }
 
@@ -37,7 +34,7 @@ class Rubbish extends Phaser.GameObjects.Sprite {
         break;
     }
     this.x = this.letRandomNumber(minX, maxX);
-    this.y = this.letRandomNumber(500, 1080);
+    this.y = this.letRandomNumber(500, 1000);
   }
 
   letRandomNumber(minX, maxX) {
@@ -48,7 +45,7 @@ class Rubbish extends Phaser.GameObjects.Sprite {
     this.scene.tweens.add({
       targets: this,
       alpha: 0,
-      duration: 2000,
+      duration: 1500,
       onComplete() {
         cb();
       },

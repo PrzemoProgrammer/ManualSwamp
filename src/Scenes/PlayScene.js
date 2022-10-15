@@ -98,27 +98,35 @@ class PlayScene extends Phaser.Scene {
 
   update() {
     this.rubbish.forEach((junk) => {
-      // console.log(this.player.life);
       if (Phaser.Math.Distance.BetweenPoints(junk, this.player) <= 140) {
         if (this.player.life == 0) {
           // console.log("you lost");
           this.scene.restart();
           return;
         }
-
-        console.log("hit");
-        this.player.life--;
-        // junk.swimTween.stop();
-        // junk.disappearing(() => {});
-
+        if (junk.moveStop) return;
+        junk.moveStop = true;
         junk.swimTween.remove();
-        junk.setRandomPosition(this.gw, this.gh);
-        junk.move(this.player);
-        if (junk.x <= this.player.x) {
-          junk.setFlipX(true);
-        }
+        junk.disappearing(() => junk.destroy());
+        this.player.life--;
+        // if (junk.moveStop) return;
+        // console.log("hit");
+        // junk.moveStop = true;
+        // this.player.life--;
+        // junk.swimTween.stop();
+        // junk.disappearing(() => {
+        //   junk.setAlpha(1);
+        //   junk.swimTween.remove();
+        //   junk.setRandomPosition(this.gw, this.gh);
+        //   junk.move(this.player);
+        //   if (junk.x <= this.player.x) {
+        //     junk.setFlipX(true);
+        //   }
+        // });
       }
     });
+
+    this.updateDepth();
   }
 
   addBackground() {
@@ -132,7 +140,11 @@ class PlayScene extends Phaser.Scene {
   addRubbish(skin) {
     const junk = new Rubbish(this, this.gw, this.gh, skin);
     this.rubbish.push(junk);
-    junk.play(skin);
+    if (skin === "crocSprite") {
+      junk.play(skin).once("animationcomplete", () => {
+        junk.playReverse(skin);
+      });
+    }
     junk.setRandomPosition(this.gw, this.gh);
     junk.move(this.player);
 
@@ -166,7 +178,7 @@ class PlayScene extends Phaser.Scene {
       }
       this.addRubbish(skin);
     }
-    this.setRandomRubbish();
+    this.setSpeedRandomRubbish();
   }
 
   addLadder() {
@@ -177,9 +189,11 @@ class PlayScene extends Phaser.Scene {
     this.arrowDetector = new ArrowDetector(this, this.gw / 2, this.gh - 100);
   }
 
-  setRandomRubbish() {
+  setSpeedRandomRubbish() {
     let randomIndex = Phaser.Math.Between(0, this.rubbish.length - 1);
+    this.rubbish[randomIndex].swimTween.remove();
     this.rubbish[randomIndex].speed = 120000;
+    this.rubbish[randomIndex].move(this.player);
   }
 
   setClickAble() {
@@ -196,10 +210,6 @@ class PlayScene extends Phaser.Scene {
       }
     });
   }
-
-  // setClickAble(lifebuoy) {
-  //   lifebuoy.onClick(() => {});
-  // }
 
   getDistance(object1, object2) {
     return Phaser.Math.Distance.BetweenPoints(object1, object2);
@@ -218,22 +228,17 @@ class PlayScene extends Phaser.Scene {
   addLifebuoy() {
     const lifebuoy = new Lifebuoy(this, this.gw, this.gh);
     lifebuoy.setRandomPosition(this.gw, this.gh);
-    lifebuoy.destroyTimer(5000);
+    lifebuoy.timeToDestroy(5000);
     lifebuoy.onClick(() => {
       lifebuoy.destroy();
       this.arrowDetector.slow();
       this.returnArrowSpeed();
-
-      // this.arrowDetector.arrowTween.updateTo("duration", 10000000000);
-      // this.arrowDetector.arrowTween.restart();
-      // this.arrowDetector.arrowTween.play();
-      console.log("help");
     });
   }
 
   addLifebuoys() {
     this.time.addEvent({
-      delay: 5000,
+      delay: 10000,
       callback: () => this.addLifebuoy(),
       loop: true,
     });
@@ -245,5 +250,10 @@ class PlayScene extends Phaser.Scene {
       callback: () => this.arrowDetector.returnSpeed(),
       loop: true,
     });
+  }
+
+  updateDepth() {
+    this.rubbish.forEach((junk) => junk.setDepth(junk.y));
+    this.player.setDepth(this.player.y);
   }
 }
