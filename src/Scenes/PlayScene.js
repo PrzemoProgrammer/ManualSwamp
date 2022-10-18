@@ -42,6 +42,11 @@ class PlayScene extends Phaser.Scene {
           `Character ${i}${j}`,
           `Swimming Character ${i}/0${j}.png`
         );
+
+        this.load.image(
+          `Character Walking ${i}${j}`,
+          `Walking Character ${i}/0${j}.png`
+        );
       }
     }
 
@@ -54,20 +59,30 @@ class PlayScene extends Phaser.Scene {
   }
 
   create() {
-    const charID = new URLSearchParams(window.location.search).get("charid");
-    console.log(charID);
+    const charID =
+      new URLSearchParams(window.location.search).get("charid") || "1";
+
     this.gw = this.game.config.width;
     this.gh = this.game.config.height;
 
     for (let i = 1; i <= 4; i++) {
       const frames = [];
+      const frames2 = [];
       for (let j = 1; j <= 6; j++) {
         frames.push({ key: `Character ${i}${j}`, frame: null });
+        frames2.push({ key: `Character Walking ${i}${j}`, frame: null });
       }
 
       this.anims.create({
         key: `Character ${i} swim`,
         frames,
+        frameRate: 10,
+        repeat: -1,
+      });
+
+      this.anims.create({
+        key: `Character ${i} Walking`,
+        frames: frames2,
         frameRate: 10,
         repeat: -1,
       });
@@ -83,11 +98,13 @@ class PlayScene extends Phaser.Scene {
 
     this.addBackground();
     // this.addWater();
+
     this.player = new Player(
       this,
       this.gw / 2,
       this.gh / 2 + 100,
-      `Character ${charID} swim`
+      `Character ${charID} swim`,
+      `Character ${charID} Walking`
     );
     this.addGarbage();
     this.addLadder();

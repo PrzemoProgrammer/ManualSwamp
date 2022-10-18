@@ -1,10 +1,11 @@
 class Player extends Phaser.GameObjects.Sprite {
-  constructor(scene, x, y, sprite) {
+  constructor(scene, x, y, sprite, walkAnim) {
     super(scene, x, y, sprite);
     this.scene = scene;
     this.x = x;
     this.y = y;
     this.sprite = sprite;
+    this.walkAnim = walkAnim;
 
     this.scene.add.existing(this);
     this.scene.physics.world.enableBody(this);
@@ -16,6 +17,7 @@ class Player extends Phaser.GameObjects.Sprite {
   }
 
   goUp(cb) {
+    this.play(this.walkAnim);
     this.scene.tweens.add({
       targets: this,
       y: 0 - this.height,
