@@ -9,7 +9,7 @@ class Timer {
 
     this.timeText = this.scene.add
       .text(this.x, this.y, "TIME ", {
-        fontFamily: "Georgia",
+        fontFamily: "ESCAPE",
         fontSize: "70px",
         color: "#FFFFFF",
         stroke: "#000000",
@@ -31,7 +31,7 @@ class Timer {
         this.timeText.x + this.timeText.displayWidth,
         this.timeText.y,
         "00:00",
-        { font: "70px Arial", fill: "#fff" }
+        { font: "70px ESCAPE", fill: "#fff" }
       )
       .setDepth(29);
   }
