@@ -29,6 +29,11 @@ class PlayScene extends Phaser.Scene {
     this.load.image("ladder", "ladder.png");
     this.load.image("player", "player.png");
     this.load.image("ripple", "ripple.png");
+    this.load.image("powerBar1", "powerBar1.png");
+    this.load.image("powerBar2", "powerBar2.png");
+    this.load.image("powerBar3", "powerBar3.png");
+    this.load.image("powerBar4", "powerBar4.png");
+    this.load.image("powerBar5", "powerBar5.png");
 
     this.load.image("arrow", "arrow.png");
     this.load.image("arrowTarget", "arrowTarget.png");
@@ -111,10 +116,12 @@ class PlayScene extends Phaser.Scene {
     this.addArrowDetector();
     this.setClickAble();
     this.addLifebuoys();
-    this.timer = new Timer(this, 40, 40);
+    this.addHealthBar();
+    this.timer = new Timer(this, 40, this.healthBar.y + 70);
 
     this.playerLadderDistance = this.getDistance(this.player, this.ladder);
     this.ladderStepDistance = this.playerLadderDistance / HITS_TO_WIN;
+    this.handleInputs = new HandleInputs(this);
   }
 
   update() {
@@ -134,6 +141,7 @@ class PlayScene extends Phaser.Scene {
 
         if (this.isWin) return;
 
+        this.healthBar.getDamage();
         this.player.life--;
         this.ladder.x += this.ladderStepDistance;
 
@@ -226,15 +234,7 @@ class PlayScene extends Phaser.Scene {
 
   setClickAble() {
     this.input.on("pointerdown", (pointer) => {
-      if (this.isWin) return;
-      if (
-        this.arrowDetector.arrow.angle <= 10 &&
-        this.arrowDetector.arrow.angle >= -10
-      ) {
-        this.moveLadder();
-      } else {
-        this.arrowDetector.arrowTween.restart();
-      }
+      this.setArrow();
     });
   }
 
@@ -285,5 +285,21 @@ class PlayScene extends Phaser.Scene {
   updateDepth() {
     this.rubbish.forEach((junk) => junk.setDepth(junk.y));
     this.player.setDepth(this.player.y);
+  }
+
+  addHealthBar() {
+    this.healthBar = new HealthBar(this, 40, 30, "powerBar1");
+  }
+
+  setArrow() {
+    if (this.isWin) return;
+    if (
+      this.arrowDetector.arrow.angle <= 10 &&
+      this.arrowDetector.arrow.angle >= -10
+    ) {
+      this.moveLadder();
+    } else {
+      this.arrowDetector.arrowTween.restart();
+    }
   }
 }
