@@ -4,7 +4,8 @@ const config = {
     default: "arcade",
     arcade: {
       debug: false,
-      gravity: { y: 0 },
+      // gravity: { y: 0 },
+      gravity: { y: 2000 },
     },
   },
   parent: "GameCanvas",

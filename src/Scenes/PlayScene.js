@@ -9,7 +9,6 @@ class PlayScene extends Phaser.Scene {
   preload() {
     this.load.setPath("./src/assets");
     this.load.image("background", "background.png");
-    // this.load.image("water", "water.png");
 
     this.load.image("cd", "cd.png");
     this.load.image("cd-submerged", "cd-submerged.png");
@@ -25,9 +24,9 @@ class PlayScene extends Phaser.Scene {
     this.load.image("ring2-submerged", "ring2-submerged.png");
     this.load.image("usbstick", "usbstick.png");
     this.load.image("usb-submerged", "usb-submerged.png");
+    this.load.image("firstPlatform", "firstPlatform.png");
 
     this.load.image("ladder", "ladder.png");
-    this.load.image("player", "player.png");
     this.load.image("ripple", "ripple.png");
     this.load.image("powerBar1", "powerBar1.png");
     this.load.image("powerBar2", "powerBar2.png");
@@ -35,32 +34,16 @@ class PlayScene extends Phaser.Scene {
     this.load.image("powerBar4", "powerBar4.png");
     this.load.image("powerBar5", "powerBar5.png");
 
-    this.load.image("arrow", "arrow.png");
-    this.load.image("arrowTarget", "arrowTarget.png");
-    this.load.image("arrowSwingBox", "arrowSwingBox.png");
+    this.load.spritesheet(
+      "character1Spritesheet",
+      "character1Spritesheet.png",
+      {
+        frameWidth: 1260 / 6,
+        frameHeight: 310,
+      }
+    );
 
     this.load.image("Manual Swamp Logo", "Manual Swamp Logo.png");
-
-    for (let i = 1; i <= 4; i++) {
-      for (let j = 1; j <= 6; j++) {
-        this.load.image(
-          `Character ${i}${j}`,
-          `Swimming Character ${i}/0${j}.png`
-        );
-
-        this.load.image(
-          `Character Walking ${i}${j}`,
-          `Walking Character ${i}/0${j}.png`
-        );
-      }
-    }
-
-    this.load.spritesheet("crocSprite", "crocSprite.png", {
-      frameWidth: 924 / 3,
-      frameHeight: 308,
-    });
-
-    // this.load.audio("bazookaShoot", "audio/bazookaShoot.mp3");
   }
 
   create() {
@@ -70,30 +53,15 @@ class PlayScene extends Phaser.Scene {
     this.gw = this.game.config.width;
     this.gh = this.game.config.height;
 
-    for (let i = 1; i <= 4; i++) {
-      const frames = [];
-      const frames2 = [];
-      for (let j = 1; j <= 6; j++) {
-        frames.push({ key: `Character ${i}${j}`, frame: null });
-        frames2.push({ key: `Character Walking ${i}${j}`, frame: null });
-      }
-
-      this.anims.create({
-        key: `Character ${i} swim`,
-        frames,
-        frameRate: 10,
-        repeat: -1,
-      });
-
-      this.anims.create({
-        key: `Character ${i} Walking`,
-        frames: frames2,
-        frameRate: 10,
-        repeat: -1,
-      });
-    }
-
     this.rubbish = [];
+    this.score = 50;
+
+    this.anims.create({
+      key: "character1-walk",
+      frames: "character1Spritesheet",
+      frameRate: 10,
+      repeat: -1,
+    });
 
     this.anims.create({
       key: "crocSprite",
@@ -102,204 +70,154 @@ class PlayScene extends Phaser.Scene {
     });
 
     this.addBackground();
-    // this.addWater();
 
     this.player = new Player(
       this,
-      this.gw / 2,
-      this.gh / 2 + 100,
-      `Character ${charID} swim`,
-      `Character ${charID} Walking`
+      this.gw / 6,
+      this.gh / 2 + 120,
+      "character1Spritesheet"
     );
+
     this.addGarbage();
-    this.addLadder();
-    this.addArrowDetector();
     this.setClickAble();
     this.addLifebuoys();
     this.addHealthBar();
+    this.addLifebuoys();
     this.timer = new Timer(this, 40, this.healthBar.y + 70);
 
-    this.playerLadderDistance = this.getDistance(this.player, this.ladder);
-    this.ladderStepDistance = this.playerLadderDistance / HITS_TO_WIN;
     this.handleInputs = new HandleInputs(this);
   }
 
   update() {
-    this.timer.updateTimer();
-    this.rubbish.forEach((junk) => {
-      if (Phaser.Math.Distance.BetweenPoints(junk, this.player) <= 140) {
-        if (this.player.life == 0) {
-          LOSE_SERVER_REQUEST(this.timer.result);
-          this.scene.start("EndScene");
-          return;
-        }
-
-        if (junk.moveStop) return;
-        junk.moveStop = true;
-        junk.swimTween.remove();
-        junk.disappearing(() => junk.destroy());
-
-        if (this.isWin) return;
-
-        this.healthBar.getDamage();
-        this.player.life--;
-        this.ladder.x += this.ladderStepDistance;
-
-        // if (junk.moveStop) return;
-        // console.log("hit");
-        // junk.moveStop = true;
-        // this.player.life--;
-        // junk.swimTween.stop();
-        // junk.disappearing(() => {
-        //   junk.setAlpha(1);
-        //   junk.swimTween.remove();
-        //   junk.setRandomPosition(this.gw, this.gh);
-        //   junk.move(this.player);
-        //   if (junk.x <= this.player.x) {
-        //     junk.setFlipX(true);
-        //   }
-        // });
-      }
+    this.timer.updateTimer(() => {
+      this.scene.start("EndScene");
     });
 
-    this.updateDepth();
+    if (this.player.body.touching.down) {
+      this.player.startWalk();
+    } else {
+      this.player.stop();
+    }
+
+    this.moveRubbish();
+    if (this.player.isFellDown(this.gh)) {
+      this.healthBar.getDamage(() => {
+        this.scene.restart();
+      });
+      this.restartPlayerPosition();
+      this.updateScore("-");
+      console.log(this.score);
+    }
+    this.moveBackground();
   }
 
   addBackground() {
-    this.background = this.add.image(0, 0, "background").setOrigin(0, 0);
+    this.background = this.add
+      .tileSprite(0, 0, 1920, 1080, "background")
+      .setOrigin(0, 0);
   }
 
-  addWater() {
-    this.water = this.add.image(0, 0, "water").setOrigin(0, 0);
-  }
-
-  addRubbish(skin) {
-    const junk = new Rubbish(this, this.gw, this.gh, skin);
-    this.rubbish.push(junk);
-    if (skin === "crocSprite") {
-      junk.play(skin).once("animationcomplete", () => {
-        junk.playReverse(skin);
-      });
-    }
-    junk.setRandomPosition(this.gw, this.gh);
-    junk.move(this.player);
-
-    if (junk.x <= this.player.x) {
-      junk.setFlipX(true);
-    }
-  }
-
-  addGarbage() {
-    for (let i = 0; i < RUBBISH_COUNT; i++) {
-      let skin = null;
-      switch (i) {
-        case 0:
-          skin = "cd-submerged";
-          break;
-        case 1:
-          skin = "usb-submerged";
-          break;
-        case 2:
-          skin = "circuit-submerged";
-          break;
-        case 3:
-          skin = "floppydisc-submerged";
-          break;
-        case 4:
-          skin = "pc-submerged";
-          break;
-        case 5:
-          skin = "crocSprite";
-          break;
-      }
-      this.addRubbish(skin);
-    }
-    this.setRandomRubbishToLowestSpeed();
-  }
-
-  addLadder() {
-    this.ladder = this.add.image(this.gw / 2 + 600, 280, "ladder");
-  }
-
-  addArrowDetector() {
-    this.arrowDetector = new ArrowDetector(this, this.gw / 2, this.gh - 100);
-  }
-
-  setRandomRubbishToLowestSpeed() {
-    let randomIndex = Phaser.Math.Between(0, this.rubbish.length - 1);
-    this.rubbish[randomIndex].swimTween.remove();
-    this.rubbish[randomIndex].speed = SLOWEST_RUBBISH_PATH_DURATION;
-    this.rubbish[randomIndex].move(this.player);
+  moveBackground() {
+    this.background.tilePositionX += 5;
   }
 
   setClickAble() {
-    this.input.on("pointerdown", (pointer) => {
-      this.setArrow();
-    });
-  }
-
-  getDistance(object1, object2) {
-    return Phaser.Math.Distance.BetweenPoints(object1, object2);
-  }
-
-  moveLadder() {
-    if (this.ladder.x >= this.player.x + 50) {
-      this.ladder.x -= this.ladderStepDistance;
-    } else {
-      this.isWin = true;
-      this.player.goUp(() => {
-        this.scene.start("EndScene");
-      });
-      WIN_SERVER_REQUEST(this.timer.result);
-      // AJAX REQUEST PLAYER WIN
-    }
-  }
-
-  addLifebuoy() {
-    const lifebuoy = new Lifebuoy(this, this.gw, this.gh);
-    lifebuoy.setRandomPosition(this.gw, this.gh);
-    lifebuoy.timeToDestroy(LIFEBUOY_LIVE_DURATION);
-    lifebuoy.onClick(() => {
-      lifebuoy.destroy();
-      this.arrowDetector.slow();
-      this.returnArrowSpeed();
-    });
-  }
-
-  addLifebuoys() {
-    this.time.addEvent({
-      delay: LIFEBUOY_SPAWN_RATE,
-      callback: () => this.addLifebuoy(),
-      loop: true,
-    });
-  }
-
-  returnArrowSpeed() {
-    this.time.addEvent({
-      delay: LIFEBOUY_EFFECT_DURATION,
-      callback: () => this.arrowDetector.returnSpeed(),
-      loop: true,
-    });
-  }
-
-  updateDepth() {
-    this.rubbish.forEach((junk) => junk.setDepth(junk.y));
-    this.player.setDepth(this.player.y);
+    this.input.on("pointerdown", (pointer) => {});
   }
 
   addHealthBar() {
     this.healthBar = new HealthBar(this, 40, 30, "powerBar1");
   }
 
-  setArrow() {
-    if (this.isWin) return;
+  addGarbage() {
+    for (let i = 0; i <= 4; i++) {
+      this.addRubbish(550 * i - 100);
+    }
+    this.setFirstPlatform();
+    this.addGarbagePerTime();
+  }
+
+  addRubbish(x) {
+    let randomLengthX = Math.floor(Phaser.Math.Between(0, 150));
+    const junk = new Rubbish(this, x + randomLengthX - 50, 900);
+
+    this.rubbish.push(junk);
+    this.physics.add.collider(this.player, junk);
+  }
+
+  moveRubbish() {
+    this.rubbish.forEach((rubbish) => rubbish.move());
+  }
+
+  addGarbagePerTime() {
+    this.time.addEvent({
+      delay: 1500,
+      callback: () => this.addRubbish(this.gw),
+      loop: true,
+    });
+  }
+
+  setFirstPlatform() {
+    let firstRubbish = this.rubbish[0];
+    firstRubbish.setTexture("firstPlatform");
+    firstRubbish.body.offset.y = 0;
+    firstRubbish.y = 900;
+    firstRubbish.body.width = 950;
+    //80
+  }
+
+  addLifebuoys() {
+    this.time.addEvent({
+      delay: 15000,
+      loop: true,
+      callback: () => {
+        this.addLifebuoy(), (this.collisionBlock = false);
+      },
+    });
+  }
+
+  addLifebuoy() {
+    const lifebuoy = new Lifebuoy(this, this.gw, 900);
+    lifebuoy.move();
+
+    this.physics.add.overlap(this.player, lifebuoy, () => {
+      lifebuoy.destroy();
+      if (this.collisionBlock) return;
+      this.healthBar.energyUP();
+      this.updateScore("+");
+      console.log(this.score);
+      this.collisionBlock = true;
+    });
+    this.physics.add.collider(this.player, lifebuoy);
+  }
+
+  restartPlayerPosition() {
+    this.player.setPosition(this.gw / 6, this.gh / 2 - 220);
+    this.player.flick();
+    this.addPlayerPlatform();
+  }
+
+  addPlayerPlatform() {
+    const junk = new Rubbish(this, this.player.body.x + 70, 890);
+    this.physics.add.collider(this.player, junk);
+    this.time.delayedCall(2000, () => {
+      junk.destroy();
+    });
+  }
+
+  updateScore(value) {
     if (
-      this.arrowDetector.arrow.angle <= 10 &&
-      this.arrowDetector.arrow.angle >= -10
-    ) {
-      this.moveLadder();
-    } else {
-      this.arrowDetector.arrowTween.restart();
+      (this.score === 50 && value === "+") ||
+      (this.score === 0 && value === "-")
+    )
+      return;
+    switch (value) {
+      case "-":
+        this.score -= 10;
+        break;
+      case "+":
+        this.score += 10;
+        break;
     }
   }
 }

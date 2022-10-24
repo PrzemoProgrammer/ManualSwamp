@@ -13,7 +13,7 @@ class HandleInputs {
 
   initAttackKeys() {
     this.keySPACE.on("down", () => {
-      this.scene.setArrow();
+      this.scene.player.jump();
     });
   }
 }

@@ -26,11 +26,6 @@ class HealthBar {
       .setScale(1.2);
   }
 
-  getDamage() {
-    this.hits++;
-    this.updateTexture();
-  }
-
   updateTexture() {
     let texture = null;
     switch (this.hits) {
@@ -53,7 +48,26 @@ class HealthBar {
     this.energyBar.setTexture(texture);
   }
 
+  energyUP() {
+    if (this.isFull()) return;
+    this.hits--;
+    this.updateTexture();
+  }
+
   isDead() {
-    return this.hits === 5;
+    return this.hits === 4;
+  }
+
+  isFull() {
+    return this.hits === 0;
+  }
+
+  getDamage(cb) {
+    if (this.isDead()) {
+      cb();
+      return;
+    }
+    this.hits++;
+    this.updateTexture();
   }
 }
