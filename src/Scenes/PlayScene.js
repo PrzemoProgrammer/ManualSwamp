@@ -91,6 +91,8 @@ class PlayScene extends Phaser.Scene {
   update() {
     this.timer.updateTimer(() => {
       this.scene.start("EndScene");
+      // AJAX REQUEST HERE
+      // this.score
     });
 
     if (this.player.body.touching.down) {
@@ -103,6 +105,8 @@ class PlayScene extends Phaser.Scene {
     if (this.player.isFellDown(this.gh)) {
       this.healthBar.getDamage(() => {
         this.scene.restart();
+        // AJAX REQUEST HERE
+        // this.score
       });
       this.restartPlayerPosition();
       this.updateScore("-");
