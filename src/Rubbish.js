@@ -27,7 +27,7 @@ class Rubbish extends Phaser.GameObjects.Sprite {
   }
 
   randomSkin() {
-    let randomNumber = Math.floor(Phaser.Math.Between(0, 5));
+    let randomNumber = Math.floor(Phaser.Math.Between(0, 4));
     let skin = null;
     switch (randomNumber) {
       case 0:
@@ -44,9 +44,6 @@ class Rubbish extends Phaser.GameObjects.Sprite {
         break;
       case 4:
         skin = "pc-submerged";
-        break;
-      case 5:
-        skin = "ladder";
         break;
     }
     return skin;

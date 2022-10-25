@@ -26,7 +26,7 @@ class PlayScene extends Phaser.Scene {
     this.load.image("usb-submerged", "usb-submerged.png");
     this.load.image("firstPlatform", "firstPlatform.png");
 
-    this.load.image("ladder", "ladder.png");
+    this.load.image("upperLadder", "upperLadder.png");
     this.load.image("ripple", "ripple.png");
     this.load.image("powerBar1", "powerBar1.png");
     this.load.image("powerBar2", "powerBar2.png");
@@ -78,6 +78,7 @@ class PlayScene extends Phaser.Scene {
       "character1Spritesheet"
     );
 
+    this.addUpperLadders();
     this.addGarbage();
     this.setClickAble();
     this.addLifebuoys();
@@ -90,7 +91,7 @@ class PlayScene extends Phaser.Scene {
 
   update() {
     this.timer.updateTimer(() => {
-      this.scene.start("DeadScene");
+      this.scene.start("EndScene");
       // AJAX REQUEST HERE
       // this.score
     });
@@ -104,7 +105,7 @@ class PlayScene extends Phaser.Scene {
     this.moveRubbish();
     if (this.player.isFellDown(this.gh)) {
       this.healthBar.getDamage(() => {
-        this.scene.restart();
+        this.scene.start("DeadScene");
         // AJAX REQUEST HERE
         // this.score
       });
@@ -223,5 +224,21 @@ class PlayScene extends Phaser.Scene {
         this.score += 10;
         break;
     }
+  }
+
+  addUpperLadder() {
+    const upperLadder = new UpperLadder(this, this.gw + 50, 600, "upperLadder");
+    this.physics.add.collider(this.player, upperLadder);
+    upperLadder.move();
+  }
+
+  addUpperLadders() {
+    this.time.addEvent({
+      delay: 10000,
+      loop: true,
+      callback: () => {
+        this.addUpperLadder();
+      },
+    });
   }
 }
