@@ -151,7 +151,12 @@ class PlayScene extends Phaser.Scene {
   }
 
   moveRubbish() {
-    this.rubbish.forEach((rubbish) => rubbish.move());
+    this.rubbish.forEach((rubbish) => {
+      rubbish.move();
+      if (rubbish.x + rubbish.displayWidth < 0) {
+        rubbish.destroy();
+      }
+    });
   }
 
   addGarbagePerTime() {
@@ -168,7 +173,6 @@ class PlayScene extends Phaser.Scene {
     firstRubbish.body.offset.y = 0;
     firstRubbish.y = 900;
     firstRubbish.body.width = 950;
-    //80
   }
 
   addLifebuoys() {
