@@ -90,7 +90,7 @@ class PlayScene extends Phaser.Scene {
 
   update() {
     this.timer.updateTimer(() => {
-      this.scene.start("EndScene");
+      this.scene.start("DeadScene");
       // AJAX REQUEST HERE
       // this.score
     });
