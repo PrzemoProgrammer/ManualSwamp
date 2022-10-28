@@ -17,13 +17,10 @@ class DeadScene extends Phaser.Scene {
       .text(
         this.gw / 2,
         this.gh / 2,
-        "@@@@@@@@@@@@@ END SCENE DESCRIPTION! @@@@@@@@@@@@@" +
-          "USE YOUR ARROW KEYS TO NAVIGATE YOUR WAY OUT OF THE DENSE" +
-          "TRIANGLE OF THE COMPLEXITY JUNGLE. " +
-          "AVOID THOSE PESKY BUGS BUT KEEP AN" +
-          "EYE OUT FOR SPOT POWERUPS" +
-          "IT'S A RACE AGAINST THE CLOCK",
-        { align: "center", font: "30px Arial", color: "black" }
+
+        "Oh no! The swamp was a bit too tricky to navigate that time around\n" +
+          "Why not try again to see if you can make it through to the end (gaining more points as you go)?",
+        { align: "center", font: "50px Arial", color: "black" }
       )
       .setOrigin(0.5)
       .setWordWrapWidth(this.gw * 0.8);

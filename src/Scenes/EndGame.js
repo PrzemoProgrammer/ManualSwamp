@@ -24,13 +24,16 @@ class EndScene extends Phaser.Scene {
       .text(
         this.gw / 2,
         this.gh / 2,
-        "@@@@@@@@@@@@@ END SCENE DESCRIPTION! @@@@@@@@@@@@@" +
-          "USE YOUR ARROW KEYS TO NAVIGATE YOUR WAY OUT OF THE DENSE" +
-          "TRIANGLE OF THE COMPLEXITY JUNGLE. " +
-          "AVOID THOSE PESKY BUGS BUT KEEP AN" +
-          "EYE OUT FOR SPOT POWERUPS" +
-          "IT'S A RACE AGAINST THE CLOCK",
-        { align: "center", font: "30px Arial", color: "black" }
+        "Well done! You made it safety through the Manual Swamp.\n" +
+          "Track your score to discover your position on the leaderboard",
+
+        // "@@@@@@@@@@@@@ END SCENE DESCRIPTION! @@@@@@@@@@@@@" +
+        //   "USE YOUR ARROW KEYS TO NAVIGATE YOUR WAY OUT OF THE DENSE" +
+        //   "TRIANGLE OF THE COMPLEXITY JUNGLE. " +
+        //   "AVOID THOSE PESKY BUGS BUT KEEP AN" +
+        //   "EYE OUT FOR SPOT POWERUPS" +
+        //   "IT'S A RACE AGAINST THE CLOCK",
+        { align: "center", font: "50px Arial", color: "black" }
       )
       .setOrigin(0.5)
       .setWordWrapWidth(this.gw * 0.8);

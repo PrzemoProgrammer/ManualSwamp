@@ -37,7 +37,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   startWalk() {
     if (!this.canWalk) return;
 
-    this.play("character1-walk");
+    this.play(this.sprite + " walk");
     this.canWalk = false;
     this.canJump = true;
   }

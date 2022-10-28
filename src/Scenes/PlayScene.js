@@ -8,7 +8,6 @@ class PlayScene extends Phaser.Scene {
 
   preload() {
     this.load.setPath("./src/assets");
-    this.load.image("background", "background.png");
 
     this.load.image("cd", "cd.png");
     this.load.image("cd-submerged", "cd-submerged.png");
@@ -28,20 +27,7 @@ class PlayScene extends Phaser.Scene {
 
     this.load.image("upperLadder", "upperLadder.png");
     this.load.image("ripple", "ripple.png");
-    this.load.image("powerBar1", "powerBar1.png");
-    this.load.image("powerBar2", "powerBar2.png");
-    this.load.image("powerBar3", "powerBar3.png");
-    this.load.image("powerBar4", "powerBar4.png");
-    this.load.image("powerBar5", "powerBar5.png");
-
-    this.load.spritesheet(
-      "character1Spritesheet",
-      "character1Spritesheet.png",
-      {
-        frameWidth: 1260 / 6,
-        frameHeight: 310,
-      }
-    );
+    this.load.image("life", "life.png");
 
     this.load.image("Manual Swamp Logo", "Manual Swamp Logo.png");
   }
@@ -53,21 +39,11 @@ class PlayScene extends Phaser.Scene {
     this.gw = this.game.config.width;
     this.gh = this.game.config.height;
 
+    this.menuScene = this.scene.get("MenuScene");
+    this.selectedSkin = this.menuScene.selectedSkin;
+
     this.rubbish = [];
     this.score = 50;
-
-    this.anims.create({
-      key: "character1-walk",
-      frames: "character1Spritesheet",
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "crocSprite",
-      frames: "crocSprite",
-      frameRate: 10,
-    });
 
     this.addBackground();
 
@@ -75,7 +51,7 @@ class PlayScene extends Phaser.Scene {
       this,
       this.gw / 6,
       this.gh / 2 + 120,
-      "character1Spritesheet"
+      this.selectedSkin
     );
 
     this.addUpperLadders();
@@ -131,7 +107,7 @@ class PlayScene extends Phaser.Scene {
   }
 
   addHealthBar() {
-    this.healthBar = new HealthBar(this, 40, 30, "powerBar1");
+    this.healthBar = new HealthBar(this, 40, 30);
   }
 
   addGarbage() {
@@ -192,7 +168,7 @@ class PlayScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, lifebuoy, () => {
       lifebuoy.destroy();
       if (this.collisionBlock) return;
-      this.healthBar.energyUP();
+      this.healthBar.heal();
       this.updateScore("+");
       console.log(this.score);
       this.collisionBlock = true;
