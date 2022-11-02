@@ -84,10 +84,10 @@ class PlayScene extends Phaser.Scene {
         this.scene.start("DeadScene");
         // AJAX REQUEST HERE
         // this.score
+        console.log(this.score);
       });
       this.restartPlayerPosition();
       this.updateScore("-");
-      console.log(this.score);
     }
     this.moveBackground();
   }
