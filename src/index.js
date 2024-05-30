@@ -4,7 +4,8 @@ const config = {
     default: "arcade",
     arcade: {
       debug: false,
-      gravity: { y: 0 },
+      // gravity: { y: 0 },
+      gravity: { y: 2000 },
     },
   },
   parent: "GameCanvas",
@@ -14,7 +15,7 @@ const config = {
     height: 1080,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [MenuScene, PlayScene, EndScene],
+  scene: [MenuScene, PlayScene, EndScene, DeadScene],
 };
 
 const game = new Phaser.Game(config);

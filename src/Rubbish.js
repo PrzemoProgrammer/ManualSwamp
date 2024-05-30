@@ -1,50 +1,51 @@
 class Rubbish extends Phaser.GameObjects.Sprite {
-  constructor(scene, x, y, sprite) {
-    super(scene, x, y, sprite);
+  constructor(scene, x, y) {
+    super(scene, x, y);
     this.scene = scene;
     this.maxX = x;
     this.maxY = y;
-    this.sprite = sprite;
 
-    this.speed = Math.floor(Phaser.Math.Between(90000, 20000));
+    this.setTexture(this.randomSkin());
+
     this.scene.add.existing(this);
     this.scene.physics.world.enableBody(this);
+
+    this.body.allowGravity = false;
+    this.body.immovable = true;
+
+    this.body.width = 140;
+    this.body.offset.x = 70;
+
+    this.body.height = 200;
+    this.body.offset.y = 90;
+
+    // console.log(this);
   }
 
-  move(player) {
-    this.swimTween = this.scene.tweens.add({
-      targets: this,
-      y: player.y,
-      x: player.x,
-      duration: this.speed,
-    });
+  move() {
+    this.x -= 6.5;
   }
 
-  setRandomPosition(w, h) {
-    let randomNumber = Phaser.Math.Between(0, 1);
-    let minX = null;
-    let maxX = null;
-
+  randomSkin() {
+    let randomNumber = Math.floor(Phaser.Math.Between(0, 4));
+    let skin = null;
     switch (randomNumber) {
       case 0:
-        (minX = 50), (maxX = 150);
+        skin = "cd-submerged";
         break;
       case 1:
-        (minX = w - 150), (maxX = w - 50);
+        skin = "usb-submerged";
+        break;
+      case 2:
+        skin = "circuit-submerged";
+        break;
+      case 3:
+        skin = "floppydisc-submerged";
+        break;
+      case 4:
+        skin = "pc-submerged";
         break;
     }
-    this.x = Phaser.Math.Between(minX, maxX);
-    this.y = Phaser.Math.Between(500, 1000);
-  }
-
-  disappearing(cb) {
-    this.scene.tweens.add({
-      targets: this,
-      alpha: 0,
-      duration: 1500,
-      onComplete() {
-        cb();
-      },
-    });
+    return skin;
   }
 }

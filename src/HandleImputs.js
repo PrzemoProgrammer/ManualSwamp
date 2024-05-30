@@ -13,7 +13,11 @@ class HandleInputs {
 
   initAttackKeys() {
     this.keySPACE.on("down", () => {
-      this.scene.setArrow();
+      this.scene.player.jump();
     });
+  }
+
+  removeSpace() {
+    game.plugins.game.input.keyboard.destroy();
   }
 }
