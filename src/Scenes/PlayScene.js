@@ -67,6 +67,7 @@ class PlayScene extends Phaser.Scene {
 
   update() {
     this.timer.updateTimer(() => {
+      this.handleInputs.removeSpace();
       this.scene.start("EndScene");
       // AJAX REQUEST HERE
       // this.score
@@ -81,6 +82,7 @@ class PlayScene extends Phaser.Scene {
     this.moveRubbish();
     if (this.player.isFellDown(this.gh)) {
       this.healthBar.getDamage(() => {
+        // this.handleInputs.removeSpace();
         this.scene.start("DeadScene");
         // AJAX REQUEST HERE
         // this.score

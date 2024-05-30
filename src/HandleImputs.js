@@ -16,4 +16,8 @@ class HandleInputs {
       this.scene.player.jump();
     });
   }
+
+  removeSpace() {
+    game.plugins.game.input.keyboard.destroy();
+  }
 }
